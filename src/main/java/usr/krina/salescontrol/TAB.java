@@ -1,6 +1,6 @@
 package usr.krina.salescontrol;
 
-public enum TABLE {
+public enum TAB {
     PRODUCT,
     CONTRACTOR,
     WHOLESALE,

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="741.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="usr.krina.salescontrol.ui.MainController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="415.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="usr.krina.salescontrol.ui.MainController">
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
@@ -23,42 +23,55 @@
             <TextField promptText="Фильтр" />
         </items>
       </ToolBar>
-      <SplitPane dividerPositions="0.677257525083612" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+      <SplitPane dividerPositions="0.5780089153046062" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
          <items>
             <TabPane fx:id="tabs" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                  <Tab text="Товары">
+                  <Tab onSelectionChanged="#tabChange" text="Товары">
                       <TableView fx:id="productTable" prefHeight="200.0" prefWidth="200.0">
                       </TableView>
                   </Tab>
-                  <Tab text="Контрагенты">
+                  <Tab onSelectionChanged="#tabChange" text="Контрагенты">
                       <TableView fx:id="contractorTable" prefHeight="200.0" prefWidth="200.0">
                       </TableView>
                   </Tab>
-                  <Tab text="Оптовые продажи">
+                  <Tab onSelectionChanged="#tabChange" text="Опт">
                       <TableView fx:id="wholesaleTable" prefHeight="200.0" prefWidth="200.0">
                       </TableView>
                   </Tab>
-                  <Tab text="Розничные продажи">
+                  <Tab onSelectionChanged="#tabChange" text="Розница">
                       <TableView prefHeight="200.0" prefWidth="200.0">
                       </TableView>
                   </Tab>
               </tabs>
             </TabPane>
-            <StackPane prefHeight="358.0" prefWidth="216.0">
+            <StackPane fx:id="editStack" disable="true" prefHeight="359.0" prefWidth="298.0">
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                  <VBox fx:id="retailBox" prefHeight="200.0" prefWidth="100.0" />
+                  <VBox fx:id="wholesaleBox" prefHeight="200.0" prefWidth="100.0" />
+                  <VBox fx:id="contractorBox" prefHeight="200.0" prefWidth="100.0" visible="false">
                      <children>
                         <Label text="Название" />
                         <TextField />
-                        <Label text="Оптовая цена" />
-                        <TextField />
-                        <Label text="Розничная цена" />
-                        <TextField />
                         <ButtonBar prefHeight="40.0" prefWidth="200.0">
                           <buttons>
-                            <Button mnemonicParsing="false" text="Сохранить" />
-                              <Button mnemonicParsing="false" text="Отмена" />
+                            <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="159.0" text="Сохранить" />
+                              <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
+                          </buttons>
+                        </ButtonBar>
+                     </children></VBox>
+                  <VBox fx:id="productBox" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                     <children>
+                        <Label text="Название" />
+                        <TextField fx:id="productName" />
+                        <Label text="Оптовая цена" />
+                        <TextField fx:id="productWholesalePrice" />
+                        <Label text="Розничная цена" />
+                        <TextField fx:id="productRetailPrice" />
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                          <buttons>
+                            <Button mnemonicParsing="false" onAction="#productCreate" text="Сохранить" />
+                              <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
                           </buttons>
                         </ButtonBar>
                      </children>

@@ -24,8 +24,7 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product")
     private List<Wholesale> wholesales;
 
-    public Product() {
-    }
+    public Product() {};
 
     public Product(String name, double wholesalePrice, double retailPrice) {
         this.name = name;

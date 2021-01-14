@@ -1,7 +1,8 @@
 package usr.krina.salescontrol.service;
 
+import org.springframework.context.annotation.Profile;
 import usr.krina.salescontrol.entity.Product;
-import usr.krina.salescontrol.repository.ContactRepository;
+import usr.krina.salescontrol.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,10 @@ import java.util.List;
 @Transactional
 public class ProductServiceImpl implements ProductService {
 
-    private final ContactRepository repository;
+    private final ProductRepository repository;
 
     @Autowired
-    public ProductServiceImpl(ContactRepository repository) {
+    public ProductServiceImpl(ProductRepository repository) {
         this.repository = repository;
     }
 
@@ -29,8 +30,8 @@ public class ProductServiceImpl implements ProductService {
      */
     @PostConstruct
     public void generateTestData() {
-        save(new Product("Иван Иванов", 5.6, 10));
-        save(new Product("Петр Петров", 3.2, 7.8));
+//        save(new Product("Иван Иванов", 5.6, 10));
+//        save(new Product("Петр Петров", 3.2, 7.8));
     }
 
     @Override
@@ -40,6 +41,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Product> findAll() {
-        return repository.findAll();
+        return (List<Product>)repository.findAll();
     }
 }
