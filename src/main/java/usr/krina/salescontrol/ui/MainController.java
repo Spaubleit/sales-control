@@ -8,11 +8,13 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import usr.krina.salescontrol.entity.Contractor;
 import usr.krina.salescontrol.entity.Product;
 import usr.krina.salescontrol.service.ProductService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Map;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class MainController {
@@ -22,42 +24,37 @@ public class MainController {
 
     // Инъекции JavaFX
     @FXML private TableView<Product> productTable;
-//    @FXML private TableView<Product> table;
-//    @FXML private TextField txtName;
-//    @FXML private TextField txtWholesalePrice;
-//    @FXML private TextField txtRetailPrice;
+    @FXML private TableView<Contractor> contractorTable;
 
     // Variables
     private ObservableList<Product> productData;
+    private ObservableList<Contractor> contractorsData;
 
     @FXML
     public void initialize() {
         // Этап инициализации JavaFX
     }
 
+    static private <T> void setColumns(TableView<T> table, Map<String, String> columns) {
+        columns.forEach((field, name) -> table.getColumns().add(new TableColumn<>(name) {{
+            setCellValueFactory(new PropertyValueFactory<>(field));
+        }}));
+    }
+
     /**
      * На этом этапе уже произведены все возможные инъекции.
      */
-    @SuppressWarnings("unchecked")
     @PostConstruct
     public void init() {
         List<Product> products = productService.findAll();
         productData = FXCollections.observableArrayList(products);
 
-        productTable.getColumns().setAll(
-                new TableColumn<>("ID") {{
-                    setCellValueFactory(new PropertyValueFactory<>("id"));
-                }},
-                new TableColumn<>("Название") {{
-                    setCellValueFactory(new PropertyValueFactory<>("name"));
-                }},
-                new TableColumn<>("Оптовая цена") {{
-                    setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
-                }},
-                new TableColumn<>("Розничная цена") {{
-                    setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
-                }}
-        );
+        setColumns(productTable, Map.ofEntries(
+                Map.entry("id", "id"),
+                Map.entry("name", "Название"),
+                Map.entry("wholesalePrice", "Оптовая цена"),
+                Map.entry("retailPrice", "Розничная цена")
+        ));
 
         productTable.setItems(productData);
     }
@@ -76,23 +73,4 @@ public class MainController {
     public void startDelete() {
 
     }
-
-//    @FXML
-//    public void addContact() {
-//        String name = txtName.getText();
-//        double phone = txtPhone.getLength();
-//        double email = txtEmail.getLength();
-//        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(phone) || StringUtils.isEmpty(email)) {
-//            return;
-//        }
-//
-//        Product product = new Product(name, phone, email);
-//        contactService.save(product);
-//        data.add(product);
-//
-//        // чистим поля
-//        txtName.setText("");
-//        txtPhone.setText("");
-//        txtEmail.setText("");
-//    }
 }

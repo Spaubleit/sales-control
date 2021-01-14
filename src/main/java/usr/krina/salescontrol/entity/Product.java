@@ -2,6 +2,7 @@ package usr.krina.salescontrol.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table
@@ -11,14 +12,17 @@ public class Product implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private double wholesalePrice;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private double retailPrice;
+
+    @OneToMany(mappedBy = "product")
+    private List<Wholesale> wholesales;
 
     public Product() {
     }
@@ -59,5 +63,13 @@ public class Product implements Serializable {
 
     public void setRetailPrice(double retailPrice) {
         this.retailPrice = retailPrice;
+    }
+
+    public List<Wholesale> getWholesales() {
+        return wholesales;
+    }
+
+    public void setWholesales(List<Wholesale> wholesales) {
+        this.wholesales = wholesales;
     }
 }
