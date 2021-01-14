@@ -32,7 +32,7 @@ public class ControllersConfiguration {
      * произведены все FXML инъекции и вызван метод инициализации контроллера.
      */
     protected ViewHolder loadView() throws IOException {
-        try (InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("main.fxml")) {
+        try (InputStream fxmlStream = getClass().getClassLoader().getResourceAsStream("design.fxml")) {
             FXMLLoader loader = new FXMLLoader();
             loader.load(fxmlStream);
             return new ViewHolder(loader.getRoot(), loader.getController());

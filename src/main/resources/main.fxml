@@ -15,12 +15,12 @@
                         <Insets right="3.0" />
                     </HBox.margin>
                 </TextField>
-                <TextField fx:id="txtPhone" promptText="Телефон">
+                <TextField fx:id="txtWholesalePrice" promptText="Телефон">
                     <HBox.margin>
                         <Insets right="3.0" />
                     </HBox.margin>
                 </TextField>
-                <TextField fx:id="txtEmail" promptText="E-mail">
+                <TextField fx:id="txtRetailPrice" promptText="E-mail">
                     <HBox.margin>
                         <Insets right="3.0" />
                     </HBox.margin>

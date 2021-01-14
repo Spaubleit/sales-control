@@ -8,9 +8,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
-import usr.krina.salescontrol.entity.Contact;
-import usr.krina.salescontrol.service.ContactService;
+import usr.krina.salescontrol.entity.Product;
+import usr.krina.salescontrol.service.ProductService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -19,30 +18,18 @@ import java.util.List;
 public class MainController {
 
     // Инъекции Spring
-    @Autowired private ContactService contactService;
+    @Autowired private ProductService productService;
 
     // Инъекции JavaFX
-    @FXML private TableView<Contact> table;
-    @FXML private TextField txtName;
-    @FXML private TextField txtPhone;
-    @FXML private TextField txtEmail;
+    @FXML private TableView<Product> productTable;
+//    @FXML private TableView<Product> table;
+//    @FXML private TextField txtName;
+//    @FXML private TextField txtWholesalePrice;
+//    @FXML private TextField txtRetailPrice;
 
     // Variables
-    private ObservableList<Contact> data;
+    private ObservableList<Product> productData;
 
-    /**
-     * Инициализация контроллера от JavaFX.
-     * Метод вызывается после того как FXML загрузчик произвел инъекции полей.
-     *
-     * Обратите внимание, что имя метода <b>обязательно</b> должно быть "initialize",
-     * в противном случае, метод не вызовется.
-     *
-     * Также на этом этапе еще отсутствуют бины спринга
-     * и для инициализации лучше использовать метод,
-     * описанный аннотацией @PostConstruct,
-     * который вызовется спрингом, после того, как им будут произведены все инъекции.
-     * {@link MainController#init()}
-     */
     @FXML
     public void initialize() {
         // Этап инициализации JavaFX
@@ -54,48 +41,58 @@ public class MainController {
     @SuppressWarnings("unchecked")
     @PostConstruct
     public void init() {
-        List<Contact> contacts = contactService.findAll();
-        data = FXCollections.observableArrayList(contacts);
+        List<Product> products = productService.findAll();
+        productData = FXCollections.observableArrayList(products);
 
-        // Столбцы таблицы
-        TableColumn<Contact, String> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        productTable.getColumns().setAll(
+                new TableColumn<>("ID") {{
+                    setCellValueFactory(new PropertyValueFactory<>("id"));
+                }},
+                new TableColumn<>("Название") {{
+                    setCellValueFactory(new PropertyValueFactory<>("name"));
+                }},
+                new TableColumn<>("Оптовая цена") {{
+                    setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
+                }},
+                new TableColumn<>("Розничная цена") {{
+                    setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
+                }}
+        );
 
-        TableColumn<Contact, String> nameColumn = new TableColumn<>("Имя");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<Contact, String> phoneColumn = new TableColumn<>("Телефон");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phone"));
-
-        TableColumn<Contact, String> emailColumn = new TableColumn<>("E-mail");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-
-        table.getColumns().setAll(idColumn, nameColumn, phoneColumn, emailColumn);
-
-        // Данные таблицы
-        table.setItems(data);
+        productTable.setItems(productData);
     }
 
-    /**
-     * Метод, вызываемый при нажатии на кнопку "Добавить".
-     * Привязан к кнопке в FXML файле представления.
-     */
     @FXML
-    public void addContact() {
-        String name = txtName.getText();
-        String phone = txtPhone.getText();
-        String email = txtEmail.getText();
-        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(phone) || StringUtils.isEmpty(email)) {
-            return;
-        }
+    public void startAdd() {
 
-        Contact contact = new Contact(name, phone, email);
-        contactService.save(contact);
-        data.add(contact);
-
-        // чистим поля
-        txtName.setText("");
-        txtPhone.setText("");
-        txtEmail.setText("");
     }
+
+    @FXML
+    public void startUpdate() {
+
+    }
+
+    @FXML
+    public void startDelete() {
+
+    }
+
+//    @FXML
+//    public void addContact() {
+//        String name = txtName.getText();
+//        double phone = txtPhone.getLength();
+//        double email = txtEmail.getLength();
+//        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(phone) || StringUtils.isEmpty(email)) {
+//            return;
+//        }
+//
+//        Product product = new Product(name, phone, email);
+//        contactService.save(product);
+//        data.add(product);
+//
+//        // чистим поля
+//        txtName.setText("");
+//        txtPhone.setText("");
+//        txtEmail.setText("");
+//    }
 }
