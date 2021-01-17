@@ -3,6 +3,7 @@ package usr.krina.salescontrol.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -113,12 +114,16 @@ public class MainController {
                 Map.entry("wholesalePrice", "Оптовая цена"),
                 Map.entry("retailPrice", "Розничная цена")
         )));
-        productTable.setItems(filteredProducts);
+        var sortedProducts = new SortedList<>(filteredProducts);
+        sortedProducts.comparatorProperty().bind(productTable.comparatorProperty());
+        productTable.setItems(sortedProducts);
         setColumns(contractorTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("name", "Название")
         )));
-        contractorTable.setItems(filteredContractors);
+        var sortedContractors = new SortedList<>(filteredContractors);
+        sortedContractors.comparatorProperty().bind(contractorTable.comparatorProperty());
+        contractorTable.setItems(sortedContractors);
         setColumns(wholesaleTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("date", "Дата"),
@@ -126,14 +131,18 @@ public class MainController {
                 Map.entry("product", "Товар"),
                 Map.entry("contractor", "Контрагент")
         )));
-        wholesaleTable.setItems(filteredWholesales);
+        var sortedWholesales = new SortedList<>(filteredWholesales);
+        sortedWholesales.comparatorProperty().bind(wholesaleTable.comparatorProperty());
+        wholesaleTable.setItems(sortedWholesales);
         setColumns(retailTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("date", "Дата"),
                 Map.entry("count", "Количество"),
                 Map.entry("product", "Товар")
         )));
-        retailTable.setItems(filteredRetail);
+        var sortedRetails = new SortedList<>(filteredRetail);
+        sortedRetails.comparatorProperty().bind(retailTable.comparatorProperty());
+        retailTable.setItems(sortedRetails);
 
         wholesaleProduct.setItems(productData);
         wholesaleContractor.setItems(contractorsData);
