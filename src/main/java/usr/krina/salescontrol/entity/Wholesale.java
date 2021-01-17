@@ -26,6 +26,24 @@ public class Wholesale {
     @JoinColumn(name = "contractor_id")
     private Contractor contractor;
 
+    public Wholesale() {
+    }
+
+    public Wholesale(int count, Date date, Product product, Contractor contractor) {
+        this.count = count;
+        this.date = date;
+        this.product = product;
+        this.contractor = contractor;
+    }
+
+    public Wholesale update(Wholesale wholesale) {
+        this.count = wholesale.count;
+        this.date = wholesale.date;
+        this.product = wholesale.product;
+        this.contractor = wholesale.contractor;
+        return this;
+    }
+
     public long getId() {
         return id;
     }

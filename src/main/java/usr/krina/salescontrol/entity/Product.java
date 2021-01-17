@@ -32,6 +32,13 @@ public class Product implements Serializable {
         this.retailPrice = retailPrice;
     }
 
+    public Product update(Product product) {
+        this.name = product.name;
+        this.wholesalePrice = product.wholesalePrice;
+        this.retailPrice = product.retailPrice;
+        return this;
+    }
+
     public Long getId() {
         return id;
     }
@@ -70,5 +77,10 @@ public class Product implements Serializable {
 
     public void setWholesales(List<Wholesale> wholesales) {
         this.wholesales = wholesales;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

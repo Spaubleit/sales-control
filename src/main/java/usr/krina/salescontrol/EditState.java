@@ -41,8 +41,8 @@ public class EditState {
         callback.accept(this);
     }
 
-    public boolean isInChangeState() {
-        return mode == EDIT_MODE.CREATE || mode == EDIT_MODE.UPDATE;
+    public EDIT_MODE getMode() {
+        return mode;
     }
 
     public Optional<Product> getProduct() {

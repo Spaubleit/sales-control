@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
@@ -40,27 +42,57 @@
                       </TableView>
                   </Tab>
                   <Tab onSelectionChanged="#tabChange" text="Розница">
-                      <TableView prefHeight="200.0" prefWidth="200.0">
+                      <TableView fx:id="retailTable" prefHeight="200.0" prefWidth="200.0">
                       </TableView>
                   </Tab>
               </tabs>
             </TabPane>
             <StackPane fx:id="editStack" disable="true" prefHeight="359.0" prefWidth="298.0">
                <children>
-                  <VBox fx:id="retailBox" prefHeight="200.0" prefWidth="100.0" />
-                  <VBox fx:id="wholesaleBox" prefHeight="200.0" prefWidth="100.0" />
-                  <VBox fx:id="contractorBox" prefHeight="200.0" prefWidth="100.0" visible="false">
+                  <VBox fx:id="retailBox" prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Label text="Название" />
-                        <TextField />
+                        <Label text="Дата" />
+                        <DatePicker fx:id="retailDate" prefWidth="500.0" />
+                        <Label text="Количество" />
+                        <TextField fx:id="retailCount" />
+                        <Label text="Товар" />
+                        <ComboBox fx:id="retailProduct" prefWidth="500.0" />
                         <ButtonBar prefHeight="40.0" prefWidth="200.0">
                           <buttons>
-                            <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="159.0" text="Сохранить" />
+                            <Button mnemonicParsing="false" onAction="#retailApply" text="Подтвердить" />
                               <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
                           </buttons>
                         </ButtonBar>
                      </children></VBox>
-                  <VBox fx:id="productBox" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                  <VBox fx:id="wholesaleBox" prefHeight="200.0" prefWidth="100.0" visible="false">
+                     <children>
+                        <Label text="Дата" />
+                        <DatePicker fx:id="wholesaleDate" prefWidth="500.0" />
+                        <Label text="Количество" />
+                        <TextField fx:id="wholesaleCount" />
+                        <Label text="Товар" />
+                        <ComboBox fx:id="wholesaleProduct" prefHeight="26.0" prefWidth="500.0" />
+                        <Label text="Контрагент" />
+                        <ComboBox fx:id="wholesaleContractor" prefHeight="26.0" prefWidth="500.0" />
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                          <buttons>
+                            <Button mnemonicParsing="false" onAction="#wholesaleApply" text="Подтвердить" />
+                              <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
+                          </buttons>
+                        </ButtonBar>
+                     </children></VBox>
+                  <VBox fx:id="contractorBox" prefHeight="200.0" prefWidth="100.0" visible="false">
+                     <children>
+                        <Label text="Название" />
+                        <TextField fx:id="contractorName" />
+                        <ButtonBar prefHeight="40.0" prefWidth="200.0">
+                          <buttons>
+                            <Button mnemonicParsing="false" onAction="#contractorApply" prefHeight="26.0" prefWidth="159.0" text="Сохранить" />
+                              <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
+                          </buttons>
+                        </ButtonBar>
+                     </children></VBox>
+                  <VBox fx:id="productBox" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
                      <children>
                         <Label text="Название" />
                         <TextField fx:id="productName" />
@@ -70,7 +102,7 @@
                         <TextField fx:id="productRetailPrice" />
                         <ButtonBar prefHeight="40.0" prefWidth="200.0">
                           <buttons>
-                            <Button mnemonicParsing="false" onAction="#productCreate" text="Сохранить" />
+                            <Button mnemonicParsing="false" onAction="#productApply" text="Сохранить" />
                               <Button mnemonicParsing="false" onAction="#clear" text="Отмена" />
                           </buttons>
                         </ButtonBar>

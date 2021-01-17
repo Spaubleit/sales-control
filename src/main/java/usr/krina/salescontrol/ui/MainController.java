@@ -3,33 +3,32 @@ package usr.krina.salescontrol.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
-import usr.krina.salescontrol.EDIT_MODE;
 import usr.krina.salescontrol.EditState;
 import usr.krina.salescontrol.TAB;
 import usr.krina.salescontrol.entity.Contractor;
 import usr.krina.salescontrol.entity.Product;
 import usr.krina.salescontrol.entity.Retail;
 import usr.krina.salescontrol.entity.Wholesale;
-import usr.krina.salescontrol.service.ProductService;
+import usr.krina.salescontrol.service.EntityService;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class MainController {
 
     // Инъекции Spring
-    @Autowired private ProductService productService;
+    @Autowired private EntityService<Product> productService;
+    @Autowired private EntityService<Contractor> contractorService;
+    @Autowired private EntityService<Wholesale> wholesaleService;
+    @Autowired private EntityService<Retail> retailService;
 
     // Инъекции JavaFX
     @FXML private TabPane tabs;
@@ -41,12 +40,20 @@ public class MainController {
 
     @FXML private TableView<Contractor> contractorTable;
     @FXML private VBox contractorBox;
+    @FXML private TextField contractorName;
 
     @FXML private TableView<Wholesale> wholesaleTable;
     @FXML private VBox wholesaleBox;
+    @FXML private DatePicker wholesaleDate;
+    @FXML private TextField wholesaleCount;
+    @FXML private ComboBox<Product> wholesaleProduct;
+    @FXML private ComboBox<Contractor> wholesaleContractor;
 
     @FXML private TableView<Retail> retailTable;
     @FXML private VBox retailBox;
+    @FXML private DatePicker retailDate;
+    @FXML private TextField retailCount;
+    @FXML private ComboBox<Product> retailProduct;
 
     @FXML private StackPane editStack;
 
@@ -54,6 +61,8 @@ public class MainController {
     // Variables
     private ObservableList<Product> productData;
     private ObservableList<Contractor> contractorsData;
+    private ObservableList<Wholesale> wholesaleData;
+    private ObservableList<Retail> retailData;
     private EditState state = new EditState(this::stateReaction);
     private TAB tab = TAB.PRODUCT;
 
@@ -67,17 +76,49 @@ public class MainController {
      */
     @PostConstruct
     public void init() {
-        List<Product> products = productService.findAll();
+        var products = productService.findAll();
         productData = FXCollections.observableArrayList(products);
-
-        setColumns(productTable, Map.ofEntries(
+        setColumns(productTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("name", "Название"),
                 Map.entry("wholesalePrice", "Оптовая цена"),
                 Map.entry("retailPrice", "Розничная цена")
-        ));
-
+        )));
         productTable.setItems(productData);
+
+
+        var contractors = contractorService.findAll();
+        contractorsData = FXCollections.observableArrayList(contractors);
+        setColumns(contractorTable, new TreeMap<>(Map.ofEntries(
+                Map.entry("id", "id"),
+                Map.entry("name", "Название")
+        )));
+        contractorTable.setItems(contractorsData);
+
+        var wholesales = wholesaleService.findAll();
+        wholesaleData = FXCollections.observableArrayList(wholesales);
+        setColumns(wholesaleTable, new TreeMap<>(Map.ofEntries(
+                Map.entry("id", "id"),
+                Map.entry("date", "Дата"),
+                Map.entry("count", "Количество"),
+                Map.entry("product", "Товар"),
+                Map.entry("contractor", "Контрагент")
+        )));
+        wholesaleTable.setItems(wholesaleData);
+
+        var retails = retailService.findAll();
+        retailData = FXCollections.observableArrayList(retails);
+        setColumns(retailTable, new TreeMap<>(Map.ofEntries(
+                Map.entry("id", "id"),
+                Map.entry("date", "Дата"),
+                Map.entry("count", "Количество"),
+                Map.entry("product", "Товар")
+        )));
+        retailTable.setItems(retailData);
+
+        wholesaleProduct.setItems(productData);
+        wholesaleContractor.setItems(contractorsData);
+        retailProduct.setItems(productData);
     }
 
     static private <T> void setColumns(TableView<T> table, Map<String, String> columns) {
@@ -87,16 +128,66 @@ public class MainController {
     }
 
     public void stateReaction(EditState state) {
-        if (state.isInChangeState()) {
-            editStack.setDisable(false);
-            state.getProduct().ifPresent(product -> {
-                productName.requestFocus();
-                productName.setText(product.getName());
-                productWholesalePrice.setText(Double.toString(product.getWholesalePrice()));
-                productRetailPrice.setText(Double.toString(product.getRetailPrice()));
-            });
-        } else {
-            editStack.setDisable(true);
+        switch (state.getMode()) {
+            case UPDATE:
+            case CREATE:
+                editStack.setDisable(false);
+                state.getProduct().ifPresent(product -> {
+                    productName.requestFocus();
+                    productName.setText(product.getName());
+                    productWholesalePrice.setText(Double.toString(product.getWholesalePrice()));
+                    productRetailPrice.setText(Double.toString(product.getRetailPrice()));
+                });
+                state.getContractor().ifPresent(contractor -> {
+                    contractorName.requestFocus();
+                    contractorName.setText(contractor.getName());
+                });
+                state.getWholesale().ifPresent(wholesale -> {
+                    wholesaleDate.requestFocus();
+                    wholesaleDate.setValue(Optional.ofNullable(wholesale.getDate())
+                            .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                            .orElse(null)
+                    );
+                    wholesaleCount.setText(Integer.toString(wholesale.getCount()));
+                    wholesaleProduct.setValue(wholesale.getProduct());
+                    wholesaleContractor.setValue(wholesale.getContractor());
+                });
+                state.getRetail().ifPresent(retail -> {
+                    retailDate.requestFocus();
+                    retailDate.setValue(Optional.ofNullable(retail.getDate())
+                            .map(date -> date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                            .orElse(null)
+                    );
+                    retailCount.setText(Integer.toString(retail.getCount()));
+                    retailProduct.setValue(retail.getProduct());
+                });
+                break;
+            case DELETE:
+                new Alert(Alert.AlertType.CONFIRMATION).showAndWait()
+                .filter(response -> response == ButtonType.OK)
+                .ifPresent(response -> {
+                    state.getProduct().ifPresent(product -> {
+                        productService.delete(product);
+                        productData.remove(product);
+                    });
+                    state.getContractor().ifPresent(contractor -> {
+                        contractorService.delete(contractor);
+                        contractorsData.remove(contractor);
+                    });
+                    state.getWholesale().ifPresent(wholesale -> {
+                        wholesaleService.delete(wholesale);
+                        wholesaleData.remove(wholesale);
+                    });
+                    state.getRetail().ifPresent(retail -> {
+                        retailService.delete(retail);
+                        retailData.remove(retail);
+                    });
+                });
+                editStack.setDisable(true);
+                break;
+            case NONE:
+                editStack.setDisable(true);
+                break;
         }
     }
 
@@ -144,16 +235,16 @@ public class MainController {
     public void startAdd() {
         switch (tab) {
             case PRODUCT:
-                state.update(new Product());
+                state.create(new Product());
                 break;
             case CONTRACTOR:
-                state.update(new Contractor());
+                state.create(new Contractor());
                 break;
             case WHOLESALE:
-                state.update(new Wholesale());
+                state.create(new Wholesale());
                 break;
             case RETAIL:
-                state.update(new Retail());
+                state.create(new Retail());
                 break;
         }
     }
@@ -167,6 +258,24 @@ public class MainController {
 
     @FXML
     public void startDelete() {
+        TableView table = null;
+        switch (tab) {
+            case PRODUCT:
+                table = productTable;
+                break;
+            case CONTRACTOR:
+                table = contractorTable;
+                break;
+            case WHOLESALE:
+                table = wholesaleTable;
+                break;
+            case RETAIL:
+                table = retailTable;
+                break;
+        }
+        Optional.ofNullable(table)
+                .flatMap(innerTable -> Optional.ofNullable(innerTable.getSelectionModel().getSelectedItem()))
+                .ifPresent(state::delete);
     }
 
     @FXML
@@ -175,14 +284,85 @@ public class MainController {
     }
 
     @FXML
-    public void productCreate() {
-        var product = new Product(
+    public void productApply() {
+        var newProduct = new Product(
                 productName.getText(),
                 Double.parseDouble(productWholesalePrice.getText()),
                 Double.parseDouble(productRetailPrice.getText())
         );
-        System.out.println(product);
-        productData.add(productService.save(product));
+        switch (state.getMode()) {
+            case CREATE:
+                productData.add(productService.save(newProduct));
+                break;
+            case UPDATE:
+                state.getProduct().ifPresent(product -> Collections.replaceAll(
+                        productData,
+                        product,
+                        productService.save(product.update(newProduct))
+                ));
+                break;
+        }
+        clear();
+    }
+
+    @FXML
+    public void contractorApply() {
+        var newContractor = new Contractor(contractorName.getText());
+        switch (state.getMode()) {
+            case CREATE:
+                contractorsData.add(contractorService.save(newContractor));
+                break;
+            case UPDATE:
+                state.getContractor().ifPresent(contractor -> Collections.replaceAll(
+                        contractorsData,
+                        contractor,
+                        contractorService.save(contractor.update(newContractor))
+                ));
+                break;
+        }
+        clear();
+    }
+
+    @FXML
+    public void wholesaleApply() {
+        var newWholesale = new Wholesale(
+                Integer.parseInt(wholesaleCount.getText()),
+                Date.from(wholesaleDate.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                wholesaleProduct.getValue(),
+                wholesaleContractor.getValue()
+        );
+        switch (state.getMode()) {
+            case CREATE:
+                wholesaleData.add(wholesaleService.save(newWholesale));
+                break;
+            case UPDATE:
+                state.getWholesale().ifPresent(wholesale -> Collections.replaceAll(
+                        wholesaleData,
+                        wholesale,
+                        wholesaleService.save(wholesale.update(newWholesale))
+                ));
+        }
+        clear();
+    }
+
+    @FXML
+    public void retailApply() {
+        var newRetail = new Retail(
+                Integer.parseInt(retailCount.getText()),
+                Date.from(retailDate.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                retailProduct.getValue()
+        );
+        switch (state.getMode()) {
+            case CREATE:
+                retailData.add(retailService.save(newRetail));
+                break;
+            case UPDATE:
+                state.getRetail().ifPresent(retail -> Collections.replaceAll(
+                        retailData,
+                        retail,
+                        retailService.save(retail.update(newRetail))
+                ));
+        }
         clear();
     }
 }

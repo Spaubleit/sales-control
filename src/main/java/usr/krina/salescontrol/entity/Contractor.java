@@ -17,6 +17,22 @@ public class Contractor implements Serializable {
     @OneToMany(mappedBy = "contractor")
     private List<Wholesale> wholesales;
 
+    public Contractor() {
+    }
+
+    public Contractor(String name) {
+        this.name = name;
+    }
+
+    public Contractor(Contractor contractor) {
+        this.name = contractor.name;
+    }
+
+    public Contractor update(Contractor contractor) {
+        this.name = contractor.name;
+        return this;
+    }
+
     public Long getId() {
         return id;
     }
@@ -39,5 +55,10 @@ public class Contractor implements Serializable {
 
     public void setWholesales(List<Wholesale> wholesales) {
         this.wholesales = wholesales;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
