@@ -22,7 +22,8 @@
           <Button mnemonicParsing="false" onAction="#startAdd" text="Добавить" />
             <Button mnemonicParsing="false" onAction="#startUpdate" text="Изменить" />
             <Button mnemonicParsing="false" onAction="#startDelete" text="Удалить" />
-            <TextField promptText="Фильтр" />
+            <TextField fx:id="searchField" promptText="Фильтр" />
+            <Button mnemonicParsing="false" onAction="#clearSearch" text="X" />
         </items>
       </ToolBar>
       <SplitPane dividerPositions="0.5780089153046062" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
@@ -49,7 +50,7 @@
             </TabPane>
             <StackPane fx:id="editStack" disable="true" prefHeight="359.0" prefWidth="298.0">
                <children>
-                  <VBox fx:id="retailBox" prefHeight="200.0" prefWidth="100.0">
+                  <VBox fx:id="retailBox" prefHeight="200.0" prefWidth="100.0" visible="false">
                      <children>
                         <Label text="Дата" />
                         <DatePicker fx:id="retailDate" prefWidth="500.0" />
@@ -81,7 +82,7 @@
                           </buttons>
                         </ButtonBar>
                      </children></VBox>
-                  <VBox fx:id="contractorBox" prefHeight="200.0" prefWidth="100.0" visible="false">
+                  <VBox fx:id="contractorBox" prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label text="Название" />
                         <TextField fx:id="contractorName" />

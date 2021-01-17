@@ -2,6 +2,7 @@ package usr.krina.salescontrol.ui;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -17,7 +18,6 @@ import usr.krina.salescontrol.entity.Wholesale;
 import usr.krina.salescontrol.service.EntityService;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -56,14 +56,14 @@ public class MainController {
     @FXML private ComboBox<Product> retailProduct;
 
     @FXML private StackPane editStack;
-
+    @FXML private TextField searchField;
 
     // Variables
     private ObservableList<Product> productData;
     private ObservableList<Contractor> contractorsData;
     private ObservableList<Wholesale> wholesaleData;
     private ObservableList<Retail> retailData;
-    private EditState state = new EditState(this::stateReaction);
+    private final EditState state = new EditState(this::stateReaction);
     private TAB tab = TAB.PRODUCT;
 
     @FXML
@@ -76,27 +76,49 @@ public class MainController {
      */
     @PostConstruct
     public void init() {
-        var products = productService.findAll();
-        productData = FXCollections.observableArrayList(products);
+        productData = FXCollections.observableArrayList(productService.findAll());
+        contractorsData = FXCollections.observableArrayList(contractorService.findAll());
+        wholesaleData = FXCollections.observableArrayList(wholesaleService.findAll());
+        retailData = FXCollections.observableArrayList(retailService.findAll());
+
+        var filteredProducts = new FilteredList<>(productData, p -> true);
+        var filteredContractors = new FilteredList<>(contractorsData, p -> true);
+        var filteredWholesales = new FilteredList<>(wholesaleData, p -> true);
+        var filteredRetail = new FilteredList<>(retailData, p -> true);
+
+        searchField.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            var search = newValue.toLowerCase();
+
+            filteredProducts.setPredicate(product ->
+                    product.getName().toLowerCase().contains(search) ||
+                    Double.toString(product.getRetailPrice()).contains(search)
+            );
+            filteredContractors.setPredicate(contractor -> contractor.getName().toLowerCase().contains(search));
+            filteredWholesales.setPredicate(wholesale ->
+                    wholesale.getDate().toString().contains(search) ||
+                    Integer.toString(wholesale.getCount()).contains(search) ||
+                    wholesale.getProduct().toString().toLowerCase().contains(search) ||
+                    wholesale.getContractor().toString().toLowerCase().contains(search)
+            );
+            filteredRetail.setPredicate(retail ->
+                    retail.getDate().toString().contains(search) ||
+                    Integer.toString(retail.getCount()).contains(search) ||
+                    retail.getProduct().toString().toLowerCase().contains(search)
+            );
+        });
+
         setColumns(productTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("name", "Название"),
                 Map.entry("wholesalePrice", "Оптовая цена"),
                 Map.entry("retailPrice", "Розничная цена")
         )));
-        productTable.setItems(productData);
-
-
-        var contractors = contractorService.findAll();
-        contractorsData = FXCollections.observableArrayList(contractors);
+        productTable.setItems(filteredProducts);
         setColumns(contractorTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("name", "Название")
         )));
-        contractorTable.setItems(contractorsData);
-
-        var wholesales = wholesaleService.findAll();
-        wholesaleData = FXCollections.observableArrayList(wholesales);
+        contractorTable.setItems(filteredContractors);
         setColumns(wholesaleTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("date", "Дата"),
@@ -104,17 +126,14 @@ public class MainController {
                 Map.entry("product", "Товар"),
                 Map.entry("contractor", "Контрагент")
         )));
-        wholesaleTable.setItems(wholesaleData);
-
-        var retails = retailService.findAll();
-        retailData = FXCollections.observableArrayList(retails);
+        wholesaleTable.setItems(filteredWholesales);
         setColumns(retailTable, new TreeMap<>(Map.ofEntries(
                 Map.entry("id", "id"),
                 Map.entry("date", "Дата"),
                 Map.entry("count", "Количество"),
                 Map.entry("product", "Товар")
         )));
-        retailTable.setItems(retailData);
+        retailTable.setItems(filteredRetail);
 
         wholesaleProduct.setItems(productData);
         wholesaleContractor.setItems(contractorsData);
@@ -364,5 +383,10 @@ public class MainController {
                 ));
         }
         clear();
+    }
+
+    @FXML
+    public void clearSearch() {
+        searchField.setText("");
     }
 }
